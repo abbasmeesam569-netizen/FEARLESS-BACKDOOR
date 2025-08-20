@@ -1,0 +1,295 @@
+-- PART 1/3
+-- FEARLESS EXECUTER — GUI (start)
+local function createFEARLESSInterface()
+    -- safely remove old GUI if present
+    pcall(function()
+        local core = game:GetService("CoreGui")
+        local old = core:FindFirstChild("FEARLESS Executer")
+        if old then old:Destroy() end
+    end)
+
+    -- create ScreenGui
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "FEARLESS Executer"
+    screenGui.ResetOnSpawn = false
+    -- parent inside CoreGui (wrapped in pcall to avoid errors on secure envs)
+    pcall(function() screenGui.Parent = game:GetService("CoreGui") end)
+
+    -- main container (red-stroked frame like your image)
+    local main = Instance.new("Frame")
+    main.Name = "Main"
+    main.Size = UDim2.new(0, 900, 0, 420)
+    main.AnchorPoint = Vector2.new(0.5, 0.5)
+    main.Position = UDim2.new(0.5, 0, 0.5, 0) -- center screen
+    main.BackgroundColor3 = Color3.fromRGB(34, 34, 34)
+    main.BorderSizePixel = 0
+    main.Parent = screenGui
+
+    -- outer red stroke
+    local outerStroke = Instance.new("UIStroke")
+    outerStroke.Name = "OuterStroke"
+    outerStroke.Parent = main
+    outerStroke.Color = Color3.fromRGB(200, 80, 90)
+    outerStroke.Thickness = 3
+    outerStroke.ApplyStrokeMode = Enum.ApplyStrokeMode.Border
+
+    -- subtle background gradient (dark)
+    local bgGrad = Instance.new("UIGradient")
+    bgGrad.Parent = main
+    bgGrad.Rotation = 90
+    bgGrad.Color = ColorSequence.new{
+        ColorSequenceKeypoint.new(0, Color3.fromRGB(42,42,42)),
+        ColorSequenceKeypoint.new(1, Color3.fromRGB(28,28,28))
+    }
+
+    -- header/title (center top) - set text to FEARLESS EXECUTER
+    local title = Instance.new("TextLabel")
+    title.Name = "Title"
+    title.Parent = main
+    title.Size = UDim2.new(0.6, 0, 0, 48)
+    title.AnchorPoint = Vector2.new(0.5, 0)
+    title.Position = UDim2.new(0.5, 0, 0, 6)
+    title.BackgroundTransparency = 1
+    title.Text = "FEARLESS EXECUTER"
+    title.Font = Enum.Font.SourceSansBold
+    title.TextSize = 36
+    title.TextColor3 = Color3.fromRGB(240,240,240)
+    title.TextStrokeTransparency = 0.8
+    title.TextWrapped = false
+-- PART 2/3
+-- FEARLESS EXECUTER — middle / executor area + big black pane
+    -- big black output / editor area (matches the screenshot's large black region)
+    local execFrame = Instance.new("Frame")
+    execFrame.Name = "ExecutorBox"
+    execFrame.Parent = main
+    execFrame.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    execFrame.Size = UDim2.new(0.95, 0, 0, 260)
+    execFrame.Position = UDim2.new(0.025, 0, 0, 64)
+    execFrame.BorderSizePixel = 0
+
+    local execCorner = Instance.new("UICorner")
+    execCorner.Parent = execFrame
+    execCorner.CornerRadius = UDim.new(0, 2)
+
+    local execStroke = Instance.new("UIStroke")
+    execStroke.Parent = execFrame
+    execStroke.Color = Color3.fromRGB(120, 35, 45)
+    execStroke.Thickness = 2
+
+    -- TextBox inside executor area (where code is pasted)
+    local execText = Instance.new("TextBox")
+    execText.Name = "TextBox"              -- common name used by many executor scripts
+    execText.Parent = execFrame
+    execText.Size = UDim2.new(1, -12, 1, -12)
+    execText.Position = UDim2.new(0, 6, 0, 6)
+    execText.BackgroundTransparency = 0
+    execText.BackgroundColor3 = Color3.fromRGB(0,0,0)
+    execText.TextColor3 = Color3.fromRGB(230,230,230)
+    execText.Font = Enum.Font.SourceSans
+    execText.TextSize = 18
+    execText.ClearTextOnFocus = false
+    execText.MultiLine = true
+    execText.TextWrapped = true
+    execText.PlaceholderText = "-- paste or write code here"
+
+    -- small top-left green username fill was REMOVED (as requested)
+    -- we do NOT create that button
+
+    -- status label (small) under title
+    local status = Instance.new("TextLabel")
+    status.Name = "Status"
+    status.Parent = main
+    status.Size = UDim2.new(0.5, -12, 0, 20)
+    status.Position = UDim2.new(0.025, 0, 0, 44)
+    status.BackgroundTransparency = 1
+    status.Text = "Status: Idle"
+    status.Font = Enum.Font.SourceSans
+    status.TextSize = 14
+    status.TextColor3 = Color3.fromRGB(200,200,200)
+-- PART 3/3
+-- FEARLESS EXECUTER — bottom buttons + wiring
+    -- bottom container for buttons
+    local btnY = 334
+    -- Execute (big left)
+    local executeBtn = Instance.new("TextButton")
+    executeBtn.Name = "Execute"
+    executeBtn.Parent = main
+    executeBtn.Size = UDim2.new(0, 240, 0, 56)
+    executeBtn.Position = UDim2.new(0, 20, 0, btnY)
+    executeBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    executeBtn.Font = Enum.Font.SourceSansBold
+    executeBtn.TextSize = 30
+    executeBtn.Text = "Execute"
+    executeBtn.TextColor3 = Color3.fromRGB(240,240,240)
+
+    local exCorner = Instance.new("UICorner", executeBtn)
+    exCorner.CornerRadius = UDim.new(0,6)
+    local exStroke = Instance.new("UIStroke", executeBtn)
+    exStroke.Color = Color3.fromRGB(150,50,60)
+    exStroke.Thickness = 2
+
+    -- Clear (big center-left)
+    local clearBtn = Instance.new("TextButton")
+    clearBtn.Name = "Clear"
+    clearBtn.Parent = main
+    clearBtn.Size = UDim2.new(0, 240, 0, 56)
+    clearBtn.Position = UDim2.new(0, 280, 0, btnY)
+    clearBtn.BackgroundColor3 = Color3.fromRGB(20,20,20)
+    clearBtn.Font = Enum.Font.SourceSansBold
+    clearBtn.TextSize = 30
+    clearBtn.Text = "Clear"
+    clearBtn.TextColor3 = Color3.fromRGB(240,240,240)
+
+    local clCorner = Instance.new("UICorner", clearBtn)
+    clCorner.CornerRadius = UDim.new(0,6)
+    local clStroke = Instance.new("UIStroke", clearBtn)
+    clStroke.Color = Color3.fromRGB(150,50,60)
+    clStroke.Thickness = 2
+
+    -- small right buttons: Reset Character, Body Type Switch, Backdoor Scanner
+    local smallW, smallH = 160, 40
+    local gap = 12
+    local xBase = 560
+
+    local resetBtn = Instance.new("TextButton")
+    resetBtn.Name = "ResetCharacter"
+    resetBtn.Parent = main
+    resetBtn.Size = UDim2.new(0, smallW, 0, smallH)
+    resetBtn.Position = UDim2.new(0, xBase, 0, btnY + 8)
+    resetBtn.BackgroundColor3 = Color3.fromRGB(16,16,16)
+    resetBtn.Font = Enum.Font.SourceSans
+    resetBtn.TextSize = 16
+    resetBtn.Text = "Reset Character"
+    resetBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    Instance.new("UICorner", resetBtn).CornerRadius = UDim.new(0,4)
+    local rStroke = Instance.new("UIStroke", resetBtn) rStroke.Color = Color3.fromRGB(150,50,60) rStroke.Thickness = 2
+
+    local bodyBtn = Instance.new("TextButton")
+    bodyBtn.Name = "BodyTypeSwitch"
+    bodyBtn.Parent = main
+    bodyBtn.Size = UDim2.new(0, smallW, 0, smallH)
+    bodyBtn.Position = UDim2.new(0, xBase + smallW + gap, 0, btnY + 8)
+    bodyBtn.BackgroundColor3 = Color3.fromRGB(16,16,16)
+    bodyBtn.Font = Enum.Font.SourceSans
+    bodyBtn.TextSize = 16
+    bodyBtn.Text = "Body Type Switch"
+    bodyBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    Instance.new("UICorner", bodyBtn).CornerRadius = UDim.new(0,4)
+    local bStroke = Instance.new("UIStroke", bodyBtn) bStroke.Color = Color3.fromRGB(150,50,60) bStroke.Thickness = 2
+
+    -- Backdoor Scanner button (small, same style) — user requested addition
+    local backdoorBtn = Instance.new("TextButton")
+    backdoorBtn.Name = "BackdoorScanner"
+    backdoorBtn.Parent = main
+    backdoorBtn.Size = UDim2.new(0, smallW, 0, smallH)
+    backdoorBtn.Position = UDim2.new(0, xBase + (smallW+gap)*2, 0, btnY + 8)
+    backdoorBtn.BackgroundColor3 = Color3.fromRGB(16,16,16)
+    backdoorBtn.Font = Enum.Font.SourceSans
+    backdoorBtn.TextSize = 16
+    backdoorBtn.Text = "Backdoor Scanner"
+    backdoorBtn.TextColor3 = Color3.fromRGB(230,230,230)
+    Instance.new("UICorner", backdoorBtn).CornerRadius = UDim.new(0,4)
+    local bdStroke = Instance.new("UIStroke", backdoorBtn) bdStroke.Color = Color3.fromRGB(150,50,60) bdStroke.Thickness = 2
+
+    -- expose references to the created UI for hooking by existing logic
+    local ui = {
+        ScreenGui = screenGui,
+        Main = main,
+        Title = title,
+        ExecutorBox = execFrame,
+        TextBox = execText,
+        Status = status,
+        ExecuteButton = executeBtn,
+        ClearButton = clearBtn,
+        ResetCharacterButton = resetBtn,
+        BodyTypeSwitchButton = bodyBtn,
+        BackdoorScannerButton = backdoorBtn
+    }
+
+    -- Default/optional behaviors (won't override your existing logic):
+    -- Clear clears the text box
+    clearBtn.MouseButton1Click:Connect(function()
+        pcall(function() execText.Text = "" end)
+    end)
+
+    -- Execute: if your script already hooks ExecuteButton, that will take precedence.
+    -- If not, we provide a harmless default that attempts to compile & run the code in the box.
+    executeBtn.MouseButton1Click:Connect(function()
+        local code = execText.Text or ""
+        if code == "" then
+            pcall(function() status.Text = "Status: Nothing to execute" end)
+            return
+        end
+        pcall(function() status.Text = "Status: Executing..." end)
+        local ok, fOrErr = pcall(function() return loadstring(code) end)
+        if not ok or type(fOrErr) ~= "function" then
+            -- compile failed
+            pcall(function() status.Text = "Status: Compile error" end)
+            return
+        end
+        -- run safely with pcall
+        local runOk, runErr = pcall(fOrErr)
+        if not runOk then
+            pcall(function() status.Text = "Status: Exec error" end)
+            warn("Execution error:", runErr)
+        else
+            pcall(function() status.Text = "Status: Exec success" end)
+        end
+    end)
+
+    -- BackdoorScanner: try to call an existing `scan()` function if one exists (original script usually defines it).
+    backdoorBtn.MouseButton1Click:Connect(function()
+        pcall(function() status.Text = "Status: Scanning..." end)
+        -- prefer local/global function named scan
+        local scanned = false
+        local ok, res = pcall(function()
+            if type(scan) == "function" then
+                scanned = true
+                return scan()
+            elseif _G and type(_G.scan) == "function" then
+                scanned = true
+                return _G.scan()
+            end
+            return nil
+        end)
+        if scanned and ok then
+            pcall(function()
+                if type(res) == "table" and #res > 0 then
+                    status.Text = "Status: Scan complete (results)"
+                    -- place results into the black text area for visibility
+                    execText.Text = table.concat(res, "\n")
+                else
+                    status.Text = "Status: No backdoors detected"
+                end
+            end)
+        else
+            pcall(function() status.Text = "Status: No scanner available" end)
+        end
+    end)
+
+    -- ResetCharacter and BodyTypeSwitch call user-defined handlers if they exist in the environment.
+    resetBtn.MouseButton1Click:Connect(function()
+        pcall(function() status.Text = "Status: Resetting character..." end)
+        local ok, _ = pcall(function()
+            if type(ResetCharacter) == "function" then return ResetCharacter() end
+            if _G and type(_G.ResetCharacter) == "function" then return _G.ResetCharacter() end
+        end)
+        if not ok then pcall(function() status.Text = "Status: Reset failed/handler missing" end) end
+    end)
+
+    bodyBtn.MouseButton1Click:Connect(function()
+        pcall(function() status.Text = "Status: Switch body type..." end)
+        local ok, _ = pcall(function()
+            if type(BodyTypeSwitch) == "function" then return BodyTypeSwitch() end
+            if _G and type(_G.BodyTypeSwitch) == "function" then return _G.BodyTypeSwitch() end
+        end)
+        if not ok then pcall(function() status.Text = "Status: Switch failed/handler missing" end) end
+    end)
+
+    -- Return UI references so the rest of your script can use them
+    return ui
+end
+
+-- auto-create UI on script run
+local ok, uiRefs = pcall(createFEARLESSInterface)
+if not ok then warn("Failed to create FEARLESS interface:", uiRefs) end
